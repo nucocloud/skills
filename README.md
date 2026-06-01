@@ -65,7 +65,7 @@ Skills are contextual and auto-loaded based on your conversation. When a request
 
 ## Cloudflare One
 
-Short, retrieval-first skills for [Cloudflare One](https://developers.cloudflare.com/cloudflare-one/) work. These skills do not duplicate product documentation; they direct agents to retrieve current docs/API schemas and apply Cloudflare One workflow guardrails.
+Short, retrieval-first skills for [Cloudflare One](https://developers.cloudflare.com/cloudflare-one/) work.
 
 | Skill | Useful for |
 |-------|------------|
