@@ -136,6 +136,8 @@ OpenFeature.addHooks(new LoggingHook(), new TelemetryHook());
 
 ## REST API (Flag Management)
 
+Source of truth: [Cloudflare Flagship API reference](https://developers.cloudflare.com/api/resources/flagship/). Use it to verify REST paths, envelopes, response fields, and permission wording before relying on examples here.
+
 ### FIRST: Check Prerequisites
 
 Before making any REST API calls (create, read, update, delete, toggle flags), verify these environment variables are set:
@@ -210,18 +212,22 @@ App name constraints: alphanumeric + hyphens + underscores, 1-64 chars.
 GET /apps/{app_id}/evaluate?flagKey=<key>&<context-attrs>
 ```
 
-Requires an API token with `flagship:evaluate` permission. Context attributes passed as query params. This endpoint is not wrapped in the management envelope and returns OpenFeature-style camelCase:
+Requires an API token with Flagship read permissions. Context attributes passed as query params. This endpoint is not wrapped in the management envelope; the SDK contract returns OpenFeature-style camelCase:
 
 ```json
 {
   "flagKey": "my-flag",
   "value": true,
   "variant": "on",
-  "reason": "TARGETING_MATCH"
+  "reason": "SPLIT"
 }
 ```
 
-### Response Shapes
+Reasons: `TARGETING_MATCH`, `SPLIT`, `DEFAULT`, `DISABLED`.
+
+### Management Response Payloads
+
+Management endpoints are wrapped in the Cloudflare v4 envelope shown above. Common `.result` payloads:
 
 **App result**
 
@@ -261,6 +267,8 @@ Requires an API token with `flagship:evaluate` permission. Context attributes pa
   "diff": { "enabled": { "from": false, "to": true } }
 }
 ```
+
+Changelog entries include the full flag state after the change. `update` entries also include `diff`.
 
 ---
 
