@@ -19,7 +19,7 @@ This reference is a fast-start with verified connection details and code. For li
 
 ## Connection Values
 
-The older `https://<account-id>.r2.cloudflarestorage.com/iceberg/<bucket>` form and "warehouse = bucket name" are **wrong**. Use:
+Use the exact **Catalog URI** and **Warehouse** printed by `npx wrangler r2 bucket catalog enable <bucket>` (also shown in the dashboard). They follow these formats:
 
 | Value | Format | Example |
 |-------|--------|---------|
@@ -27,7 +27,7 @@ The older `https://<account-id>.r2.cloudflarestorage.com/iceberg/<bucket>` form 
 | Warehouse | `{ACCOUNT_ID}_{BUCKET}` (hyphens preserved) | `4482a1..._live-data` |
 | Token | R2 API token (Admin R&W on Storage + R&W on Data Catalog) | `cfut_...` |
 
-Get these from `npx wrangler r2 bucket catalog enable <bucket>`. The Iceberg `/config` route needs `?warehouse={WAREHOUSE}`.
+The Iceberg `/config` route needs `?warehouse={WAREHOUSE}`.
 
 ## Architecture
 

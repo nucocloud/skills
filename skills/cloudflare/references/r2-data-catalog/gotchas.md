@@ -1,10 +1,10 @@
 # R2 Data Catalog Gotchas
 
-Non-obvious failure modes and behavior the docs under-document. For the current limits/recommendations table, pull `https://developers.cloudflare.com/r2/data-catalog/` and `.../table-maintenance/`.
+Common failure modes and operational behavior. For limits, recommendations, and supported settings, pull `https://developers.cloudflare.com/r2/data-catalog/` and `.../table-maintenance/`.
 
 ## Connection / Auth
 
-- **Wrong catalog URI or warehouse (most common).** Use `https://catalog.cloudflarestorage.com/{ACCOUNT_ID}/{BUCKET}` and warehouse `{ACCOUNT_ID}_{BUCKET}`. The old `.../iceberg/<bucket>` form and "warehouse = bucket name" fail. Always copy both from `wrangler r2 bucket catalog enable`.
+- **Catalog URI / warehouse mismatch (most common).** Copy both values exactly from `wrangler r2 bucket catalog enable` (Catalog URI `https://catalog.cloudflarestorage.com/{ACCOUNT_ID}/{BUCKET}`, warehouse `{ACCOUNT_ID}_{BUCKET}`). Mismatched values fail to connect.
 - **401 Unauthorized** — token lacks Data Catalog R&W. Test with `catalog.list_namespaces()`.
 - **403 on data files** — token lacks R2 Storage. Open beta requires **Admin Read & Write on R2 Storage even for read-only** data access.
 - **`/config` "Warehouse name missing in query param"** — the Iceberg `/v1/config` route needs `?warehouse={ACCOUNT_ID}_{BUCKET}`. PyIceberg/PySpark add it automatically when you set `warehouse=`.

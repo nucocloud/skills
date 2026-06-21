@@ -37,24 +37,15 @@ npx wrangler r2 sql query "$ACCOUNT_ID"_my-bucket \
   "SELECT * FROM default.my_table LIMIT 10"                # 3. query
 ```
 
-## Quick Reference of What's Supported 
+## SQL Surface
 
-✅ `SELECT [DISTINCT]`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`
-✅ **JOINs** (INNER/LEFT/RIGHT/FULL OUTER/CROSS/implicit, multi-way)
-✅ **Subqueries** (IN, EXISTS, scalar, derived) · **CTEs** (multi-table, with JOINs)
-✅ **Set ops** (UNION/UNION ALL, INTERSECT, EXCEPT)
-✅ **Window functions** — full set + `QUALIFY` (inline `OVER (...)` only)
-✅ Aggregate + scalar + JSON functions, complex types (struct/array/map), `EXPLAIN [FORMAT JSON]`
-
-❌ `OFFSET`, named `WINDOW` clause, `func(DISTINCT ...)` on aggregates, `ARRAY_AGG`/`STRING_AGG`, `LATERAL`, `UNNEST`/`PIVOT`, INSERT/UPDATE/DELETE/DDL, `SELECT` without `FROM`
-
-Detail + workarounds: [api.md](api.md), [gotchas.md](gotchas.md).
+R2 SQL is read-only and supports a broad analytical SQL surface (SELECT, JOINs, subqueries, CTEs, set operations, window functions, and aggregate/scalar/JSON functions over complex types). For the authoritative, current list of supported syntax, functions, and limitations, see the SQL reference and limitations docs linked above. [api.md](api.md) has query templates.
 
 ## When to Use
 
 **Use for:** SQL analytics over Iceberg (logs, BI, fraud, ad-hoc), multi-cloud queries without egress, dashboards (query from a Worker via HTTP).
 
-**Don't use for:** writes (use PySpark/PyIceberg), real-time OLTP (<100 ms), or the few unsupported features above (use PySpark).
+**Don't use for:** writes (use PySpark/PyIceberg) or real-time OLTP (<100 ms).
 
 ## No Workers Binding
 
@@ -63,7 +54,7 @@ There is no `env.R2_SQL` binding. Query from a Worker via `fetch()` to the REST 
 ## Reading Order
 
 1. [configuration.md](configuration.md) — enable catalog, tokens, env setup
-2. [api.md](api.md) — SQL syntax templates, verified JOIN/window examples, response format, data types
+2. [api.md](api.md) — SQL syntax templates, JOIN/window examples, response format, data types
 3. [patterns.md](patterns.md) — CLI/REST/Worker queries, use cases, pagination, performance
 4. [gotchas.md](gotchas.md) — what works vs. not, performance, troubleshooting
 

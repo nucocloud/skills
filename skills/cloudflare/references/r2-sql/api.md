@@ -1,6 +1,6 @@
 # R2 SQL API Reference
 
-Read-only SQL over Iceberg (Apache DataFusion). Syntax templates and verified feature examples. **The full function catalogs live in the docs** (`sql-reference/aggregate-functions/`, `.../scalar-functions/`, `.../complex-types/`) — pull those rather than relying on a hardcoded list. The JOIN/window examples here are included because the docs currently say (incorrectly) that these are unsupported.
+Read-only SQL over Iceberg (Apache DataFusion). Query templates only. For the authoritative list of supported syntax, functions, data types, and limitations, pull the SQL reference (`sql-reference/`, `.../aggregate-functions/`, `.../scalar-functions/`, `.../complex-types/`) and `reference/limitations-best-practices/`.
 
 ## Query Endpoint
 
@@ -50,7 +50,7 @@ DESCRIBE namespace.table;  -- columns, types, partition keys
 EXPLAIN [FORMAT JSON] SELECT ...;   -- execution plan (free; no data scanned)
 ```
 
-## JOINs / Subqueries / CTEs / Set Ops (verified — docs say unsupported)
+## JOINs / Subqueries / CTEs / Set Ops
 
 ```sql
 -- JOINs: all types + multi-way
@@ -73,9 +73,9 @@ SELECT zone_id FROM ns.firewall_events WHERE action = 'block'
 UNION SELECT zone_id FROM ns.http_requests WHERE risk_score > 0.8;
 ```
 
-## Window Functions (verified — full set; docs say unsupported)
+## Window Functions
 
-Inline `OVER (...)` only — the named `WINDOW w AS (...)` clause is **not** supported.
+Use inline `OVER (...)`. See the SQL reference for the full list of supported window functions and frame syntax.
 
 ```sql
 SELECT event_id,
@@ -91,16 +91,9 @@ SELECT event_id, mag_type, magnitude FROM ns.earthquakes
 QUALIFY ROW_NUMBER() OVER (PARTITION BY mag_type ORDER BY magnitude DESC) = 1;
 ```
 
-Verified working: ranking (`ROW_NUMBER`, `RANK`, `DENSE_RANK`, `PERCENT_RANK`, `NTILE`, `CUME_DIST`), navigation (`LAG`/`LEAD` w/ offset+default, `FIRST_VALUE`, `LAST_VALUE`, `NTH_VALUE`), aggregates over windows, all frame types (`ROWS`/`RANGE` incl. `INTERVAL`/`GROUPS`), `QUALIFY`, windows in CTEs, multiple `OVER` specs.
-
 ## Functions
 
-Full catalogs (33 aggregates, 170+ scalars, JSON, array/map) are in the docs — pull `sql-reference/aggregate-functions/` and `.../scalar-functions/`. Notes that aren't obvious from the docs:
-
-- **Use `approx_distinct(col)`** for distinct counts — `COUNT(DISTINCT ...)` and other `func(DISTINCT ...)` aggregates are **not** supported.
-- **JSON** functions accept variadic paths: `json_get_int(doc, 'user', 'profile', 'level')`.
-- **Maps:** use `map_keys` / `map_values` / `map_extract` — `map_entries()` fails on stored map columns (error `80001`).
-- Common building blocks: `COUNT`/`SUM`/`AVG`/`MIN`/`MAX`, `approx_percentile_cont`, `coalesce`, `nullif`, `CASE`, `CAST`/`TRY_CAST`/`::`, `EXTRACT`, `date_trunc`, `to_timestamp_*`, `concat`/`||`, `lower`/`upper`, `regexp_*`, `sha256`.
+Aggregate, scalar, JSON, and array/map function catalogs are in the docs — pull `sql-reference/aggregate-functions/` and `.../scalar-functions/`. JSON functions accept variadic paths, e.g. `json_get_int(doc, 'user', 'profile', 'level')`.
 
 ## Data Types
 
@@ -116,15 +109,12 @@ WHERE status = 200 AND method = 'GET'              -- not '200', not GET
 ```sql
 SELECT pricing['price'] AS price, get_field(pricing, 'discount') AS disc FROM ns.t;  -- struct
 SELECT tags[1] AS first_tag, array_length(tags) AS n FROM ns.t;                       -- array (1-indexed)
-SELECT map_keys(meta), map_extract(meta, 'source') FROM ns.t;                         -- map (NOT map_entries)
+SELECT map_keys(meta), map_extract(meta, 'source') FROM ns.t;                         -- map
 ```
 
-## Error Codes
+## Errors
 
-| Code | Meaning |
-|------|---------|
-| 40003 | Unsupported SQL feature (OFFSET, named WINDOW, etc.) |
-| 80001 | `map_entries()` on stored map columns |
+Failed queries return `{"success": false, "errors": [{"code": ..., "message": ...}]}`. For error codes and troubleshooting, see `https://developers.cloudflare.com/r2-sql/troubleshooting/`.
 
 ## See Also
 

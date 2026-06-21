@@ -94,9 +94,9 @@ WHERE h.__ingest_ts >= '2026-06-01T00:00:00Z'
 GROUP BY z.domain ORDER BY requests DESC LIMIT 25;
 ```
 
-## Pagination (no OFFSET)
+## Cursor-Based Pagination
 
-`OFFSET` is unsupported — use cursor-based pagination on a sortable (ideally partition) column:
+Paginate on a sortable (ideally partition) column rather than `OFFSET`:
 
 ```sql
 SELECT * FROM logs.requests ORDER BY __ingest_ts DESC LIMIT 500;                       -- page 1
